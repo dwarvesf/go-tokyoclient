@@ -15,27 +15,45 @@ const (
 type GameState struct {
 	Bounds     []float64    `json:"bounds"`
 	Players    []Player     `json:"players"`
-	Bullets    []Bullet     `json:"bullets"`
+	Items      []Item       `json:"items"`
 	Dead       []DeadPlayer `json:"dead"`
+	Bullets    []Bullet     `json:"bullets"`
 	Scoreboard map[int]int  `json:"scoreboard"`
+}
+
+// Point is a point in the game
+type Point struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
 
 // Player is the player state sent by the server
 type Player struct {
-	ID       int     `json:"id"`
-	Angle    float64 `json:"angle"`
-	Throttle float64 `json:"throttle"`
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
+	ID int `json:"id"`
+	Point
+	Angle        float64 `json:"angle"`
+	Throttle     float64 `json:"throttle"`
+	Radius       float64 `json:"radius"`
+	BulletRadius float64 `json:"bullet_radius"`
+	BulletSpeed  float64 `json:"bullet_speed"`
+	BulletLimit  int     `json:"bullet_limit"`
+}
+
+type Item struct {
+	ID int `json:"id"`
+	Point
+	Radius   float64 `json:"radius"`
+	ItemType string  `json:"item_type"`
 }
 
 // Bullet is the bullet state sent by the server
 type Bullet struct {
-	ID       int     `json:"id"`
+	ID int `json:"id"`
+	Point
 	PlayerID int     `json:"player_id"`
 	Angle    float64 `json:"angle"`
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
+	Radius   float64 `json:"radius"`
+	Speed    float64 `json:"speed"`
 }
 
 // Bot is the interface that the bot must implement
@@ -57,6 +75,10 @@ type Event struct {
 	Data  EventData `json:"data"`
 }
 
+type StateEvent struct {
+	Data GameState `json:"data"`
+}
+
 type IDEvent struct {
 	ID int `json:"data"`
 }
@@ -74,11 +96,11 @@ func ParseEvent(eventData []byte) (*Event, error) {
 
 	switch event.Event {
 	case "state":
-		var stateData GameState
+		var stateData StateEvent
 		if err := json.Unmarshal([]byte(eventData), &stateData); err != nil {
 			return nil, fmt.Errorf("error parsing state event data: %v", err)
 		}
-		event.Data = stateData
+		event.Data = stateData.Data
 
 	case "id":
 		var idData IDEvent
