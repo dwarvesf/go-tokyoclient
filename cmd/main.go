@@ -27,12 +27,12 @@ func main() {
 		UserName:  userName,
 	}
 	client := tokyoclient.NewClient(&SimpleBot{})
-	gamePad, err := client.Start(*cfg)
+	controller, err := client.Start(*cfg)
 	if err != nil {
 		fmt.Println("Error starting client:", err)
 		return
 	}
-	gamePad.Fire()
+	controller.Fire()
 
 	<-interrupt
 }
@@ -43,7 +43,7 @@ type SimpleBot struct {
 }
 
 // Consume consumes the event
-func (c *SimpleBot) HandleEvent(userID int, teammates map[int]string, gamePad tokyoclient.GamePad, state tokyoclient.GameState) error {
+func (c *SimpleBot) HandleEvent(userID int, teammates map[int]string, controller tokyoclient.Controller, state tokyoclient.GameState) error {
 	fmt.Println("User ID:", userID)
 
 	// get user info
@@ -60,7 +60,7 @@ func (c *SimpleBot) HandleEvent(userID int, teammates map[int]string, gamePad to
 
 	if distance <= 400 {
 		c.ReadyShot = false
-		return gamePad.Rotate(angle + math.Pi/2)
+		return controller.Rotate(angle + math.Pi/2)
 	}
 
 	// random action for each stick
@@ -70,13 +70,13 @@ func (c *SimpleBot) HandleEvent(userID int, teammates map[int]string, gamePad to
 		c.ReadyShot = true
 		// random add small angle
 		angle += (rand.Float64() - 0.5) * math.Pi / 4
-		return gamePad.Rotate(angle)
+		return controller.Rotate(angle)
 	case 1:
 		if c.ReadyShot {
-			return gamePad.Fire()
+			return controller.Fire()
 		}
 	case 2:
-		return gamePad.Throttle(1)
+		return controller.Throttle(1)
 	}
 
 	return nil
