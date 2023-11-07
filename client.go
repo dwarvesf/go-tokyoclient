@@ -21,11 +21,11 @@ const (
 // EventConsumer is the interface that the client must implement
 type EventConsumer interface {
 	// HandleEvent handles the event from the server
-	HandleEvent(userID int, teammates map[int]string, gamePad GamePad, state GameState) error
+	HandleEvent(userID int, teammates map[int]string, controller Controller, state GameState) error
 }
 
-// GamePad is the interface that lib provides to the client to interact with the game client
-type GamePad interface {
+// Controller is the interface that lib provides to the client to interact with the game client
+type Controller interface {
 	// Rotate rotates the ship
 	Rotate(angle float64) error
 	// Throttle throttles the ship
@@ -52,7 +52,7 @@ func NewClient(dispatch EventConsumer) *Client {
 	}
 }
 
-func (c *Client) GamePad() (GamePad, error) {
+func (c *Client) Controller() (Controller, error) {
 	if c.conn == nil {
 		return nil, ErrConnNotInitialized
 	}
@@ -68,7 +68,7 @@ func (c *Client) writeMessage(message string) error {
 	return c.conn.WriteMessage(websocket.TextMessage, []byte(message))
 }
 
-func (c *Client) Start(cfg Config) (GamePad, error) {
+func (c *Client) Start(cfg Config) (Controller, error) {
 	startedSignal := make(chan struct{})
 	go func() {
 		c.start(cfg, startedSignal)

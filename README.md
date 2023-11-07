@@ -22,10 +22,10 @@ import "github.com/dwarvesf/go-tokyoclient"
 type SimpleBot struct{}
 
 // Consume consumes the event
-func (c *SimpleBot) HandleEvent(userID int, teammates map[int]string, gamePad tokyoclient.GamePad, state tokyoclient.GameState) error {
+func (c *SimpleBot) HandleEvent(userID int, teammates map[int]string, controller tokyoclient.Controller, state tokyoclient.GameState) error {
 	fmt.Println("User ID:", userID)
 
-	err := gamePad.Throttle(1)
+	err := controller.Throttle(1)
 	if err != nil {
 		fmt.Println("Error throttling:", err)
 	}
@@ -33,11 +33,11 @@ func (c *SimpleBot) HandleEvent(userID int, teammates map[int]string, gamePad to
 	angle := rand.Float64() * 2 * math.Pi
 
 	fmt.Println("Rotating by:", angle)
-	gamePad.Rotate(angle)
+	controller.Rotate(angle)
 	if err != nil {
 		fmt.Println("Error throttling:", err)
 	}
-	err = gamePad.Fire()
+	err = controller.Fire()
 	if err != nil {
 		fmt.Println("Error firing:", err)
 		// return err
@@ -78,12 +78,12 @@ func main() {
 		UserName:  userName,
 	}
 	client := tokyoclient.NewClient(&SimpleBot{})
-	gamePad, err := client.Start(*cfg)
+	controller, err := client.Start(*cfg)
 	if err != nil {
 		fmt.Println("Error starting client:", err)
 		return
 	}
-	gamePad.Fire()
+	controller.Fire()
 
 	<-interrupt
 }
@@ -100,16 +100,16 @@ func main() {
 ```go
 type EventConsumer interface {
 	// HandleEvent handles the event from the server
-	HandleEvent(userID int, teammates map[int]string, gamePad GamePad, state GameState) error
+	HandleEvent(userID int, teammates map[int]string, controller Controller, state GameState) error
 }
 ```
 
-### GamePad
+### Controller
 
-`GamePad` is an interface provided by the library to the client. It offers methods to control the ship in the game. The `GamePad` interface includes methods to rotate the ship (`Rotate`), adjust throttle (`Throttle`), and fire bullets (`Fire`).
+`Controller` is an interface provided by the library to the client. It offers methods to control the ship in the game. The `Controller` interface includes methods to rotate the ship (`Rotate`), adjust throttle (`Throttle`), and fire bullets (`Fire`).
 
 ```go
-type GamePad interface {
+type Controller interface {
 	// Rotate rotates the ship
 	Rotate(angle float64) error
 
