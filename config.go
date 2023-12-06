@@ -4,6 +4,8 @@ package tokyoclient
 type Config struct {
 	// ServerURL is the URL of the server
 	ServerURL string
+	// RoomToken is the token of the room
+	RoomToken string
 	// APIKey is the unique key
 	APIKey string
 	// UserName is the display name
@@ -15,5 +17,5 @@ const (
 )
 
 func (c *Config) GetServerURL() string {
-	return "ws://" + c.ServerURL + socketPath + "?key=" + c.APIKey + "&name=" + c.UserName
+	return "ws://" + c.ServerURL + socketPath + "?key=" + c.APIKey + "&name=" + c.UserName + "&room_token=" + c.RoomToken
 }

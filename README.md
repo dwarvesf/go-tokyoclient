@@ -65,6 +65,7 @@ const (
 	serverHost = "localhost:8091" // Replace with the actual server host
 	userKey    = "webuild"        // Replace with your unique user key
 	userName   = "andy"        // Replace with your display name
+	roomToken  = "wCimjaw"        // Replace with your display name
 )
 
 func main() {
@@ -74,6 +75,7 @@ func main() {
 	fmt.Println("Starting client:", userKey, userName)
 	cfg := &tokyoclient.Config{
 		ServerURL: serverHost,
+		RoomToken: roomToken,
 		APIKey:    userKey,
 		UserName:  userName,
 	}
